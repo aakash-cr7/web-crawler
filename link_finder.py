@@ -22,7 +22,7 @@ class LinkFinder(HTMLParser):
                     self.links_set.add(url)
 
     def page_links(self):
-        return self.links
+        return self.links_set
 
 #finder = LinkFinder()
 #finder.feed('<html><head><a hrf="https://www.google.com"></a></head></html>')

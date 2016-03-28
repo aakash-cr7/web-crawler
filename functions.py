@@ -1,4 +1,5 @@
 import os
+from urllib.parse import urlparse
 
 def create_directory(directory):
     if not os.path.exists(directory):
@@ -6,9 +7,8 @@ def create_directory(directory):
         os.makedirs(directory)
 
 def write_file(path, data):
-    f = open(path, 'w')
-    f.write(data)
-    f.close()
+    with open(path, 'w') as f:
+        f.write(data)
 
 # Appending data to current file
 def append(path, data):
@@ -17,6 +17,7 @@ def append(path, data):
 
 # Deleting content of a file
 def delete_file_content(path):
+    print('in delete ' + path)
     with open(path, 'w'):
         pass
 
@@ -31,21 +32,45 @@ def file_to_set(file_name):
 
 # Converting each item of a set into a new line in a file
 def set_to_file(urls, file):
+    # Fix for if the file path is not there
+    #if file == '':
+    #   return
     delete_file_content(file)
     for link in sorted(urls):
         append(file, link)
 
 # Creating project folder, files
 def create_files(project_name, base_url):
-    
+
     # Creating a waiting list, a list of links 
-    queue = project_name + '/queue.txt' 
+    queue = os.path.join(project_name, 'queue.txt')
     # A list of already visited links
-    crawled_list = project_name + '/crawled_list.txt'
+    crawled_list = os.path.join(project_name, 'crawled_list.txt')
 
     if not os.path.isfile(queue):
-        write_file('queue', base_url)
+        write_file(queue, base_url)
     if not os.path.isfile(crawled_list):
         # Creating empty file
-        write_file('crawled_list', '')  
+        write_file(crawled_list, '')  
+
+# (name.example.com)
+def get_sub_domain_name(url):
+    try:
+        return urlparse(url).netloc
+    except:
+        return '' 
+
+# Get domain name (example.com)
+def get_domain_name(url):
+    try:
+        results = get_sub_domain_name(url).split('.')
+        # Fix for getting google.co.in
+        if results[-2] == 'co':
+            return results[-3] + '.' + results[-2] + '.' + results[-1]
+        return results[-2] + '.' + results[-1]
+    except:
+        return ''
+
+#print(get_domain_name('https://www.google.co.in/?gfe_rd=cr&ei=Gw_5Vr2lEYSM8Qemu4HICw&gws_rd=ssl#q=india'))
+
 
